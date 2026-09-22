@@ -1,0 +1,35 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch: # ให้เรากดสั่งทำ APK เองได้ตามใจชอบ
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Create Flutter Project & Build
+        run: |
+          flutter create --org com.mycharacter .
+          flutter pub add http
+          cp main.dart lib/main.dart
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CharacterBot-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
